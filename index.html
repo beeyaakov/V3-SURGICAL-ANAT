@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>V3 Surgical Anatomy</title>
+<style>
+body{margin:0;background:#06070d;color:#d0dcff;overflow:hidden;font-family:'Rajdhani',sans-serif}
+canvas{display:block;width:100vw;height:100vh;cursor:crosshair}
+#hud{position:fixed;top:14px;right:14px;background:rgba(8,12,22,.88);border:1px solid rgba(80,120,200,.25);border-radius:10px;padding:12px 14px;font-family:monospace;font-size:11.5px;line-height:1.6;color:#9ab8d8;min-width:200px;pointer-events:none}
+#tool-selector{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px;background:rgba(8,12,22,.88);border:1px solid rgba(80,120,200,.25);border-radius:50px;padding:8px 16px}
+.tool-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 14px;border-radius:36px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);color:#7090a0;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;cursor:pointer;transition:all .2s}
+.tool-btn.active{background:rgba(80,140,220,.22);color:#e0f0ff;border-color:rgba(120,180,255,.5);box-shadow:0 0 16px rgba(80,140,255,.25)}
+#alert-banner{display:none;position:fixed;top:14px;left:50%;transform:translateX(-50%);background:rgba(120,0,0,.85);border:1px solid rgba(255,60,60,.6);border-radius:8px;padding:8px 24px;font-family:monospace;font-size:13px;color:#ffa0a0;pointer-events:none}
+#depth-warning{display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(40,20,0,.85);border:1px solid rgba(255,180,40,.5);border-radius:6px;padding:6px 18px;font-family:monospace;font-size:12px;pointer-events:none}
+#title{position:fixed;top:14px;left:18px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;letter-spacing:.18em;color:rgba(160,200,255,.55);pointer-events:none;text-transform:uppercase}
+#title span{display:block;font-size:10px;font-weight:300;letter-spacing:.22em;color:rgba(120,160,220,.35);margin-top:1px}
+</style>
+</head>
+<body>
+<canvas id="root"></canvas>
+<div id="title">V3 Surgical<span>Anatomical Depth Simulator</span></div>
+<div id="hud"></div>
+<div id="alert-banner">⬤ HEMORRHAGE CRITICAL</div>
+<div id="depth-warning"></div>
+<div id="tool-selector">
+  <button class="tool-btn active" onclick="window.Tools&&window.Tools.setActive(0)">✦ SCALPEL</button>
+  <button class="tool-btn" onclick="window.Tools&&window.Tools.setActive(1)">⊕ INJECTOR</button>
+  <button class="tool-btn" onclick="window.Tools&&window.Tools.setActive(2)">⚡ CAUTERIZE</button>
+</div>
+<script type="module">
+import { Engine }       from "./Engine.js";
+import { Registry }     from "./Registry.js";
+import { DepthManager } from "./depth.js";
+import { Tissue }       from "./Tissue.js";
+import { Layers }       from "./Layers.js";
+import { Tools }        from "./Tools.js";
+import { Masking }      from "./Masking.js";
+import { Performance }  from "./Performance.js";
+import { Plugins }      from "./Plugins.js";
+
+window.Engine=Engine; window.Registry=Registry; window.DepthManager=DepthManager;
+window.Tissue=Tissue; window.Layers=Layers; window.Tools=Tools;
+window.Masking=Masking; window.Performance=Performance; window.Plugins=Plugins;
+
+Engine.init("root"); Registry.init(); DepthManager.init(); Tissue.init();
+Layers.init(); Tools.init(); Masking.init(); Performance.init(); Plugins.init();
+
+const _upd=Registry.update.bind(Registry);
+Registry.update=function(dt){DepthManager.update(dt);_upd(dt);};
+Engine.start();
+setTimeout(()=>window.Tools&&window.Tools.syncHUD(),100);
+</script>
+</body>
+</html>
